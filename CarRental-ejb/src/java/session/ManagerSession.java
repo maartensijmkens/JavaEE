@@ -21,12 +21,9 @@ public class ManagerSession implements ManagerSessionRemote {
     
     @Override
     public Set<CarType> getCarTypes(String company) {
-        try {
-            return new HashSet<>(em.find(CarRentalCompany.class, company).getAllTypes());
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(ManagerSession.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        }
+        return new HashSet<>(em.createQuery("SELECT c.carTypes FROM CarRentalCompany c WHERE c.name LIKE :company")
+                    .setParameter("company", company)
+                    .getResultList());
     }
 
     @Override
