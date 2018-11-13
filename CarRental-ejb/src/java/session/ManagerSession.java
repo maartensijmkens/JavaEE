@@ -28,40 +28,25 @@ public class ManagerSession implements ManagerSessionRemote {
 
     @Override
     public Set<Integer> getCarIds(String company, String type) {
-        Set<Integer> out = new HashSet<>();
-        try {
-            for(Car c: em.find(CarRentalCompany.class, company).getCars(type)){
-                out.add(c.getId());
-            }
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(ManagerSession.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        }
-        return out;
+        return new HashSet<>(em.createQuery("SELECT c.cars FROM CarRentalCompany c WHERE c.name LIKE :company AND c.cars.type LIKE :type")
+                    .setParameter("company", company)
+                    .setParameter("type", type)
+                    .getResultList());
     }
 
     @Override
     public int getNumberOfReservations(String company, String type, int id) {
-        try {
-            return em.find(CarRentalCompany.class, company).getCar(id).getReservations().size();
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(ManagerSession.class.getName()).log(Level.SEVERE, null, ex);
-            return 0;
-        }
+        return em.createQuery("SELECT c.cars FROM CarRentalCompany c WHERE c.name LIKE :company AND c.cars.id LIKE :id")
+                    .setParameter("company", company)
+                    .setParameter("id", id)
+                    .getResultList().size();
     }
 
     @Override
     public int getNumberOfReservations(String company, String type) {
-        Set<Reservation> out = new HashSet<>();
-        try {
-            for(Car c: em.find(CarRentalCompany.class, company).getCars(type)){
-                out.addAll(c.getReservations());
-            }
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(ManagerSession.class.getName()).log(Level.SEVERE, null, ex);
-            return 0;
-        }
-        return out.size();
+            return em.createQuery("SELECT COUNT(c.cars) FROM CarRentalCompany c WHERE c.name LIKE :company AND c.cars.type LIKE :type")
+                .setParameter("company", company)
+                .setParameter("type", type).getFirstResult();
     }
 
 }
