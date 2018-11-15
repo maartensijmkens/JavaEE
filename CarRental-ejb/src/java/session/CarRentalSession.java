@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateful;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import rental.CarType;
 import rental.Quote;
 import rental.RentalStore;
@@ -16,12 +18,16 @@ import rental.ReservationException;
 @Stateful
 public class CarRentalSession implements CarRentalSessionRemote {
 
+    @PersistenceContext
+    EntityManager em;
+    
     private String renter;
     private List<Quote> quotes = new LinkedList<Quote>();
 
     @Override
     public Set<String> getAllRentalCompanies() {
-        return new HashSet<String>(RentalStore.getRentals().keySet());
+        return new HashSet<>(em.createQuery("SELECT c.name FROM CarRentalCompany c")
+                    .getResultList());
     }
     
     @Override

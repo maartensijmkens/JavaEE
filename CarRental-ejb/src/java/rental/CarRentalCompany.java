@@ -111,6 +111,10 @@ public class CarRentalCompany implements Serializable {
         }
         throw new IllegalArgumentException("<" + name + "> No car with uid " + uid);
     }
+    
+    public void addCar(Car car) {
+        cars.add(car);
+    }
 
     public Set<Car> getCars(CarType type) {
         Set<Car> out = new HashSet<Car>();
