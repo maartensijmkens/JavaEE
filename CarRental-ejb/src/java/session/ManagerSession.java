@@ -53,7 +53,9 @@ public class ManagerSession implements ManagerSessionRemote {
     
     @Override
     public int getNumberOfReservationsBy(String clientName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return em.createQuery("SELECT r FROM Reservation r WHERE r.carRenter LIKE :clientName")
+                .setParameter("clientName", clientName)
+                .getResultList().size();
     }
 
     

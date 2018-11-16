@@ -3,6 +3,7 @@ package client;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import javax.ejb.EJB;
 import javax.naming.InitialContext;
 import rental.CarType;
 import rental.Reservation;
@@ -11,6 +12,12 @@ import session.CarRentalSessionRemote;
 import session.ManagerSessionRemote;
 
 public class Main extends AbstractTestManagement<CarRentalSessionRemote, ManagerSessionRemote> {
+    
+    @EJB
+    private static CarRentalSessionRemote session;
+    
+    @EJB
+    private static ManagerSessionRemote ms;
 
     public Main(String scriptFile) {
         super(scriptFile);
@@ -38,12 +45,12 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
 
     @Override
     protected CarRentalSessionRemote getNewReservationSession(String name) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return session;
     }
 
     @Override
     protected ManagerSessionRemote getNewManagerSession(String name, String carRentalName) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return ms;
     }
 
     @Override
