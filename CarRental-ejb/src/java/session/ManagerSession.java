@@ -52,6 +52,12 @@ public class ManagerSession implements ManagerSessionRemote {
     }
     
     @Override
+    public int getNumberOfReservationsBy(String clientName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    
+    @Override
     public Set<String> getBestClients() {
         return new HashSet<>(em.createQuery("SELECT r.carRenter FROM Reservation r GROUP BY r.carRenter ORDER BY count(r) DESC LIMIT 1")
             .getResultList());
@@ -59,7 +65,7 @@ public class ManagerSession implements ManagerSessionRemote {
     
     @Override
     public CarType getMostPopularCarType(String company, int year) {
-        return em.createQuery("SELECT r.type FROM Reservation r GROUP BY r.type ORDER BY count(r.type) DESC LIMIT 1 ")
+        return (CarType) em.createQuery("SELECT r.type FROM Reservation r GROUP BY r.type ORDER BY count(r.type) DESC LIMIT 1 ").getResultList().get(0);
     }
     
     @Override
@@ -81,5 +87,4 @@ public class ManagerSession implements ManagerSessionRemote {
         company.addCar(car);
         em.persist(car);
     }
-
 }

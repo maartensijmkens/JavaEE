@@ -80,4 +80,14 @@ public class CarRentalSession implements CarRentalSessionRemote {
         }
         renter = name;
     }
+
+    @Override
+    public String getCheapestCarType(Date start, Date end, String region) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void createQuote(String name, Date start, Date end, String carType, String region) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }
