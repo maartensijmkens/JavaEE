@@ -23,14 +23,14 @@ public class ManagerSession implements ManagerSessionRemote {
     
     @Override
     public Set<CarType> getCarTypes(String company) {
-        return new HashSet<>(em.createQuery("SELECT c.carTypes FROM CarRentalCompany c WHERE c.name LIKE :company")
+        return new HashSet<>(em.createQuery("SELECT DISTINCT company.carTypes FROM CarRentalCompany company WHERE company.name = :company")
                     .setParameter("company", company)
                     .getResultList());
     }
 
     @Override
     public Set<Integer> getCarIds(String company, String type) {
-        return new HashSet<>(em.createQuery("SELECT c.cars FROM CarRentalCompany c WHERE c.name LIKE :company AND c.cars.type LIKE :type")
+        return new HashSet<>(em.createQuery("SELECT company.cars.id FROM CarRentalCompany company WHERE c.name = :company AND company.cars.type = :type")
                     .setParameter("company", company)
                     .setParameter("type", type)
                     .getResultList());
@@ -38,7 +38,7 @@ public class ManagerSession implements ManagerSessionRemote {
 
     @Override
     public int getNumberOfReservations(String company, String type, int id) {
-        return em.createQuery("SELECT c.cars FROM CarRentalCompany c WHERE c.name LIKE :company AND c.cars.id LIKE :id")
+        return em.createQuery("SELECT company.cars FROM CarRentalCompany company WHERE company.name = :company AND company.cars.id = :id")
                     .setParameter("company", company)
                     .setParameter("id", id)
                     .getResultList().size();
@@ -46,40 +46,52 @@ public class ManagerSession implements ManagerSessionRemote {
 
     @Override
     public int getNumberOfReservations(String company, String type) {
-        return em.createQuery("SELECT COUNT(c.cars) FROM CarRentalCompany c WHERE c.name LIKE :company AND c.cars.type LIKE :type")
-            .setParameter("company", company)
-            .setParameter("type", type).getFirstResult();
+        return 0;
+        //return em.createQuery("SELECT COUNT(company.cars) FROM CarRentalCompany company WHERE company.name = :company AND company.cars.type = :type")
+        //    .setParameter("company", company)
+        //    .setParameter("type", type).getFirstResult();
     }
     
     @Override
+    public int getNumberOfReservationsBy(String renter) {
+        return em.createQuery("SELECT COUNT(reservation) FROM Reservation reservation WHERE reservation.carRenter = :renter")
+            .setParameter("renter", renter).getFirstResult();
+    }   
+    
+    @Override
     public Set<String> getBestClients() {
-        return new HashSet<>(em.createQuery("SELECT r.carRenter FROM Reservation r GROUP BY r.carRenter ORDER BY count(r) DESC LIMIT 1")
+        return new HashSet<>(em.createQuery("SELECT reservation.carRenter FROM Reservation reservation GROUP BY reservation.carRenter ORDER BY count(reservation) DESC LIMIT 1")
             .getResultList());
     }
     
     @Override
     public CarType getMostPopularCarType(String company, int year) {
-        return em.createQuery("SELECT r.type FROM Reservation r GROUP BY r.type ORDER BY count(r.type) DESC LIMIT 1 ")
+        //return em.createQuery("SELECT r.type FROM Reservation r GROUP BY r.type ORDER BY count(r.type) DESC LIMIT 1 ")
+        return null;
     }
     
     @Override
-    public void addCompany(String name, List<String> regions) {
+    public synchronized void addCompany(String name, List<String> regions) {
         CarRentalCompany company = new CarRentalCompany(name, regions, new ArrayList<Car>());
         em.persist(company);
     }
     
     @Override
     public void addCarType(String name, int nbOfSeats, float trunkSpace, double rentalPricePerDay, boolean smokingAllowed) {
-        CarType carType = new CarType(name, nbOfSeats, trunkSpace, rentalPricePerDay, smokingAllowed);
-        em.persist(carType);
+        if (em.find(CarType.class, name) == null) {
+            CarType carType = new CarType(name, nbOfSeats, trunkSpace, rentalPricePerDay, smokingAllowed);
+            em.persist(carType);
+        }
     }
     
     @Override
-    public void addCar(String companyName, int uid, CarType type) {
-        Car car = new Car(uid, type);
-        CarRentalCompany company = em.find(CarRentalCompany.class, companyName);
-        company.addCar(car);
-        em.persist(car);
+    public void addCar(String companyName, int id, String carTypeName) {
+        if (em.find(Car.class, id) == null) {
+            CarRentalCompany company = em.find(CarRentalCompany.class, companyName);
+            CarType carType = em.find(CarType.class, carTypeName);
+            Car car = new Car(id, carType);
+            company.addCar(car);
+        }
     }
 
 }

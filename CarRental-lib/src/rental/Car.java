@@ -5,22 +5,22 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.GenerationType;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.GenerationType;
-import javax.persistence.GeneratedValue;
 
 @Entity
 public class Car implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue
     private int id;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST)
     private CarType type;
-    @OneToMany(mappedBy="car")
+    @OneToMany(cascade = CascadeType.ALL)
     private Set<Reservation> reservations;
 
     /***************
@@ -53,9 +53,9 @@ public class Car implements Serializable {
         return type;
     }
 	
-	public void setType(CarType type) {
-		this.type = type;
-	}
+    public void setType(CarType type) {
+        this.type = type;
+    }
     /****************
      * RESERVATIONS *
      ****************/

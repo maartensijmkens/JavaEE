@@ -4,8 +4,8 @@
     <jta-data-source>jdbc/sample</jta-data-source>
     <class>rental.Car</class>
     <class>rental.CarRentalCompany</class>
-    <class>rental.Reservation</class>
     <class>rental.CarType</class>
+    <class>rental.Reservation</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>

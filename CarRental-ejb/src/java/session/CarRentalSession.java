@@ -8,9 +8,9 @@ import java.util.Set;
 import javax.ejb.Stateful;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import rental.CarRentalCompany;
 import rental.CarType;
 import rental.Quote;
-import rental.RentalStore;
 import rental.Reservation;
 import rental.ReservationConstraints;
 import rental.ReservationException;
@@ -22,7 +22,7 @@ public class CarRentalSession implements CarRentalSessionRemote {
     EntityManager em;
     
     private String renter;
-    private List<Quote> quotes = new LinkedList<Quote>();
+    private List<Quote> quotes = new LinkedList<>();
 
     @Override
     public Set<String> getAllRentalCompanies() {
@@ -32,9 +32,10 @@ public class CarRentalSession implements CarRentalSessionRemote {
     
     @Override
     public List<CarType> getAvailableCarTypes(Date start, Date end) {
-        List<CarType> availableCarTypes = new LinkedList<CarType>();
-        for(String crc : getAllRentalCompanies()) {
-            for(CarType ct : RentalStore.getRentals().get(crc).getAvailableCarTypes(start, end)) {
+        List<CarType> availableCarTypes = new LinkedList<>();
+        for(String company : getAllRentalCompanies()) {
+            CarRentalCompany carRentalCompany = em.find(CarRentalCompany.class, company);
+            for(CarType ct : carRentalCompany.getAvailableCarTypes(start, end)) {
                 if(!availableCarTypes.contains(ct))
                     availableCarTypes.add(ct);
             }
@@ -43,14 +44,20 @@ public class CarRentalSession implements CarRentalSessionRemote {
     }
 
     @Override
-    public Quote createQuote(String company, ReservationConstraints constraints) throws ReservationException {
-        try {
-            Quote out = RentalStore.getRental(company).createQuote(constraints, renter);
-            quotes.add(out);
-            return out;
-        } catch(Exception e) {
-            throw new ReservationException(e);
+    public Quote createQuote(String client, ReservationConstraints constraints) throws Exception {
+        Set<String> companies = getAllRentalCompanies();
+        Exception exception = null;
+        for(String company : companies) {
+            try {
+                CarRentalCompany carRentalCompany = em.find(CarRentalCompany.class, company);
+                Quote out = carRentalCompany.createQuote(constraints, client);
+                quotes.add(out);
+                return out;
+            } catch(IllegalArgumentException | ReservationException e) {
+                exception = e;
+            }           
         }
+        throw new ReservationException("TEST");
     }
 
     @Override
@@ -60,14 +67,17 @@ public class CarRentalSession implements CarRentalSessionRemote {
 
     @Override
     public List<Reservation> confirmQuotes() throws ReservationException {
-        List<Reservation> done = new LinkedList<Reservation>();
+        List<Reservation> done = new LinkedList<>();
         try {
             for (Quote quote : quotes) {
-                done.add(RentalStore.getRental(quote.getRentalCompany()).confirmQuote(quote));
+                CarRentalCompany carRentalCompany = em.find(CarRentalCompany.class, quote.getRentalCompany());
+                done.add(carRentalCompany.confirmQuote(quote));
             }
         } catch (Exception e) {
-            for(Reservation r:done)
-                RentalStore.getRental(r.getRentalCompany()).cancelReservation(r);
+            for(Reservation r:done) {
+                CarRentalCompany carRentalCompany = em.find(CarRentalCompany.class, r.getRentalCompany());
+                carRentalCompany.cancelReservation(r);
+            }
             throw new ReservationException(e);
         }
         return done;

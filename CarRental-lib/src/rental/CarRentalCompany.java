@@ -9,10 +9,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.persistence.CascadeType;
 
 import javax.persistence.Id;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
 @Entity
 public class CarRentalCompany implements Serializable {
@@ -20,11 +22,12 @@ public class CarRentalCompany implements Serializable {
     private static Logger logger = Logger.getLogger(CarRentalCompany.class.getName());
     @Id
     private String name;
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Car> cars;
-    @OneToMany
+    @Transient
     private Set<CarType> carTypes = new HashSet<CarType>();
-	private List<String> regions;
+    @Transient
+    private List<String> regions;
 
 	
     /***************

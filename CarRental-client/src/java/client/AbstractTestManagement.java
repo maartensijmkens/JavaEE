@@ -65,7 +65,7 @@ public abstract class AbstractTestManagement<ReservationSession, ManagerSession>
      *
      * @throws Exception if things go wrong, throw exception
      */
-    protected abstract CarType getMostPopularCarTypeIn(ManagerSession ms, String carRentalCompanyName, int year) throws Exception;
+    //protected abstract CarType getMostPopularCarTypeIn(ManagerSession ms, String carRentalCompanyName, int year) throws Exception;
 
     //protected abstract String getMostPopularCarRentalCompany(ManagerSession ms) throws Exception;
 
@@ -146,7 +146,7 @@ public abstract class AbstractTestManagement<ReservationSession, ManagerSession>
            int year = Integer.valueOf(scriptReader.nextToken()); 
            String favorite = null;
            List<String> favorites = Arrays.asList(pars.split("/"));
-           CarType ct = getMostPopularCarTypeIn(rental, name, year);
+           CarType ct = null;//getMostPopularCarTypeIn(rental, name, year);
            if (ct != null) {
                favorite = ct.getName();
                if (favorites.contains(favorite)) {

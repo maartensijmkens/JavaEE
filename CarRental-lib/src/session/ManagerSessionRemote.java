@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 import javax.ejb.Remote;
 import rental.CarType;
-import rental.Reservation;
 
 @Remote
 public interface ManagerSessionRemote {
@@ -17,6 +16,8 @@ public interface ManagerSessionRemote {
     
     public int getNumberOfReservations(String company, String type);
     
+    public int getNumberOfReservationsBy(String renter);
+    
     public Set<String> getBestClients();
     
     public CarType getMostPopularCarType(String company, int year);
@@ -25,5 +26,5 @@ public interface ManagerSessionRemote {
     
     public void addCarType(String name, int nbOfSeats, float trunkSpace, double rentalPricePerDay, boolean smokingAllowed);
     
-    public void addCar(String name, int uid, CarType type);
+    public void addCar(String companyName, int id, String carTypeName);
 }
