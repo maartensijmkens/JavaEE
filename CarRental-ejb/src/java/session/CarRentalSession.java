@@ -45,11 +45,10 @@ public class CarRentalSession implements CarRentalSessionRemote {
     
     @Override 
     public String getCheapestCarType(Date start, Date end, String region) {
-        // TODO: filter on region
-        return (String) em.createQuery("SELECT DISTINCT ct.name FROM Car car, CarRentalCompany c, CarType ct WHERE car.type = ct AND car.id != ANY (SELECT r.carId FROM Reservation r WHERE (r.startDate > :start AND r.startDate < :end) OR (r.endDate > :start AND r.endDate < :end)) ORDER BY ct.rentalPricePerDay")
+        return (String) em.createQuery("SELECT DISTINCT ct.name FROM Car car, CarRentalCompany c, CarType ct WHERE :region MEMBER OF c.regions AND car MEMBER OF c.cars AND car.type = ct AND car.id != ALL (SELECT r.carId FROM Reservation r WHERE (r.startDate > :start AND r.startDate < :end) OR (r.endDate > :start AND r.endDate < :end)) ORDER BY ct.rentalPricePerDay")
         .setParameter("start", start)
         .setParameter("end", end)
-        //.setParameter("region", region)
+        .setParameter("region", region)
                 .getResultList().get(0);
     }
 

@@ -25,7 +25,6 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
     }
 
     public static void main(String[] args) throws Exception {
-        System.out.println("start program");
         Main main = new Main("trips");
         // Load all companies, car and cartypes using a managersession
         Set<String> companies = new HashSet<>(Arrays.asList("hertz", "dockx"));
@@ -34,13 +33,11 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
             CrcData data = loadData(company + ".csv");
             ms.addCompany(data.name, data.regions);
            for (Car car : data.cars) {
-                System.out.println("add car " + car.getId());
                 CarType carType = car.getType();
                 ms.addCarType(carType.getName(), carType.getNbOfSeats(), carType.getTrunkSpace(), carType.getRentalPricePerDay(), carType.isSmokingAllowed());
                 ms.addCar(data.name, car.getId(), carType.getName());
             }
         }
-        System.out.println("start running trips");
         main.run();
     }
 
@@ -51,7 +48,6 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
 
     @Override
     protected String getCheapestCarType(CarRentalSessionRemote session, Date start, Date end, String region) throws Exception {
-        System.out.println("cheapest car zoeke");
         return session.getCheapestCarType(start, end, region);
     }
 
