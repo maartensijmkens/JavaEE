@@ -42,9 +42,19 @@ public class CarRentalSession implements CarRentalSessionRemote {
         }
         return availableCarTypes;
     }
+    
+    @Override 
+    public String getCheapestCarType(Date start, Date end, String region) {
+        // TODO: filter on region
+        return (String) em.createQuery("SELECT DISTINCT ct.name FROM Car car, CarRentalCompany c, CarType ct WHERE car.type = ct AND car.id != ANY (SELECT r.carId FROM Reservation r WHERE (r.startDate > :start AND r.startDate < :end) OR (r.endDate > :start AND r.endDate < :end)) ORDER BY ct.rentalPricePerDay")
+        .setParameter("start", start)
+        .setParameter("end", end)
+        //.setParameter("region", region)
+                .getResultList().get(0);
+    }
 
     @Override
-    public Quote createQuote(String client, ReservationConstraints constraints) throws Exception {
+    public synchronized Quote createQuote(String client, ReservationConstraints constraints) throws Exception {
         Set<String> companies = getAllRentalCompanies();
         Exception exception = null;
         for(String company : companies) {
@@ -57,7 +67,7 @@ public class CarRentalSession implements CarRentalSessionRemote {
                 exception = e;
             }           
         }
-        throw new ReservationException("TEST");
+        throw new ReservationException("No available cars");
     }
 
     @Override
@@ -66,7 +76,7 @@ public class CarRentalSession implements CarRentalSessionRemote {
     }
 
     @Override
-    public List<Reservation> confirmQuotes() throws ReservationException {
+    public synchronized List<Reservation> confirmQuotes() throws ReservationException {
         List<Reservation> done = new LinkedList<>();
         try {
             for (Quote quote : quotes) {

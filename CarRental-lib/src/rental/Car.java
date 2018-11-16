@@ -16,7 +16,7 @@ import javax.persistence.OneToMany;
 @Entity
 public class Car implements Serializable {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy=GenerationType.AUTO)
     private int id;
     @OneToOne(cascade = CascadeType.PERSIST)
     private CarType type;

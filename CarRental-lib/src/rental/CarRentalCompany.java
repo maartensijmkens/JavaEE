@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.CascadeType;
+import javax.persistence.ElementCollection;
 
 import javax.persistence.Id;
 import javax.persistence.Entity;
@@ -26,7 +27,7 @@ public class CarRentalCompany implements Serializable {
     private List<Car> cars;
     @Transient
     private Set<CarType> carTypes = new HashSet<CarType>();
-    @Transient
+    @ElementCollection
     private List<String> regions;
 
 	
@@ -116,6 +117,9 @@ public class CarRentalCompany implements Serializable {
     }
     
     public void addCar(Car car) {
+        if (!carTypes.contains(car.getType())) {
+            carTypes.add(car.getType());
+        }
         cars.add(car);
     }
 
@@ -157,7 +161,6 @@ public class CarRentalCompany implements Serializable {
             throws ReservationException {
         logger.log(Level.INFO, "<{0}> Creating tentative reservation for {1} with constraints {2}",
                 new Object[]{name, guest, constraints.toString()});
-
 
         if (!this.regions.contains(constraints.getRegion()) || !isAvailable(constraints.getCarType(), constraints.getStartDate(), constraints.getEndDate())) {
             throw new ReservationException("<" + name

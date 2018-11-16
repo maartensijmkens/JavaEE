@@ -19,7 +19,7 @@ import session.CarRentalSessionRemote;
 import session.ManagerSessionRemote;
 
 public class Main extends AbstractTestManagement<CarRentalSessionRemote, ManagerSessionRemote> {
-
+    
     public Main(String scriptFile) {
         super(scriptFile);
     }
@@ -51,10 +51,11 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
 
     @Override
     protected String getCheapestCarType(CarRentalSessionRemote session, Date start, Date end, String region) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("cheapest car zoeke");
+        return session.getCheapestCarType(start, end, region);
     }
 
-    //@Override
+    @Override
     protected CarType getMostPopularCarTypeIn(ManagerSessionRemote ms, String carRentalCompanyName, int year) throws Exception {
         return ms.getMostPopularCarType(carRentalCompanyName, year);
     }
@@ -68,8 +69,8 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
 
     @Override
     protected ManagerSessionRemote getNewManagerSession(String name, String carRentalName) throws Exception {
-        ManagerSessionRemote out = (ManagerSessionRemote) (new InitialContext()).lookup(ManagerSessionRemote.class.getName());
-        return out;
+        ManagerSessionRemote ms = (ManagerSessionRemote) (new InitialContext()).lookup(ManagerSessionRemote.class.getName());
+        return ms;
     }
 
     @Override
