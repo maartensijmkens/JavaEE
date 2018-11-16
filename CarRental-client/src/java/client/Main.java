@@ -45,6 +45,7 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
 
     @Override
     protected CarRentalSessionRemote getNewReservationSession(String name) throws Exception {
+        session.setRenterName(name);
         return session;
     }
 
